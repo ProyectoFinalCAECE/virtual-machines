@@ -1,0 +1,11 @@
+# encoding: utf-8
+
+site 'http://community.opscode.com/api/v1'
+
+cookbook "apt"
+cookbook "nginx", {}
+cookbook "git", {}
+cookbook "redisio", '~> 2.3.0'
+cookbook 'nodejs', '~> 2.4.0'
+cookbook "vim", {}
+cookbook "postgresql", {}
