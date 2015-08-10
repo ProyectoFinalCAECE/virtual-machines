@@ -1,0 +1,81 @@
+Vagrant.configure("2") do |config|
+
+  config.vm.box = "ubuntu/trusty64"
+
+  config.ssh.forward_agent = true
+
+  config.vm.hostname = 'node-dev-box'
+
+  config.vm.network :forwarded_port, guest: 3000, host: 3000
+
+  config.vm.provider "virtualbox" do |v|
+     v.memory = 1024
+     v.cpus = 1
+  end
+
+  config.vm.provision :chef_solo do |chef|
+    chef.cookbooks_path = ["cookbooks"]
+    chef.add_recipe :apt
+    chef.add_recipe 'nginx'
+    chef.add_recipe 'git'
+    chef.add_recipe 'redisio'
+    chef.add_recipe 'nodejs'
+    chef.add_recipe 'vim'
+    chef.add_recipe 'postgresql::server'
+    chef.json = {
+      :nginx      => {
+        :dir                => "/etc/nginx",
+        :log_dir            => "/var/log/nginx",
+        :binary             => "/usr/sbin/nginx",
+        :user               => "www-data",
+        :init_style         => "runit",
+        :pid                => "/var/run/nginx.pid",
+        :worker_connections => "1024"
+      },
+      :git        => {
+        :prefix => "/usr/local"
+      },
+      :redisio      => {
+        :bind        => "127.0.0.1",
+        :port        => "6379",
+        :config_path => "/etc/redis/redis.conf",
+        :daemonize   => "yes",
+        :timeout     => "300",
+        :loglevel    => "notice",
+        :password    => "987654321"
+      },
+      :postgresql => {
+        :config   => {
+          :listen_addresses => "*",
+          :port             => "5432"
+        },
+        :pg_hba   => [
+          {
+            :type   => "local",
+            :db     => "postgres",
+            :user   => "postgres",
+            :addr   => nil,
+            :method => "trust"
+          },
+          {
+            :type   => "host",
+            :db     => "all",
+            :user   => "all",
+            :addr   => "0.0.0.0/0",
+            :method => "md5"
+          },
+          {
+            :type   => "host",
+            :db     => "all",
+            :user   => "all",
+            :addr   => "::1/0",
+            :method => "md5"
+          }
+        ],
+        :password => {
+          :postgres => "123456789"
+        }
+      }
+    }
+  end
+end
