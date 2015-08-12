@@ -49,3 +49,9 @@ For chef folders (librarian)
 #######
 */tmp/*
 */cookbooks/*
+
+#######
+For projects folders
+#######
+*/node-services/*
+!*/node-services/.keep
